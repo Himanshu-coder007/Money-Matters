@@ -104,7 +104,7 @@ const Dashboard = () => {
 
         // Fetch all transactions
         const transactionsResponse = await fetch(
-          `${API_URL}/all-transactions?limit=20&offset=12`,
+          `${API_URL}/all-transactions?limit=10&offset=0`,
           {
             method: "GET",
             headers: {
