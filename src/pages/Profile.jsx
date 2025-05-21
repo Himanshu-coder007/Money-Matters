@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiEdit, FiPlus } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { LOCAL_STORAGE_KEYS } from "../utils/constants";
 
@@ -35,7 +35,7 @@ const Profile = () => {
             name: user.name,
             email: user.email,
             dob: formatDate(user.date_of_birth),
-            username: user.name, // Assuming username is same as name
+            username: user.name,
             presentAddress: user.present_address || "Not provided",
             permanentAddress: user.permanent_address || "Not provided",
             city: user.city || "Not provided",
@@ -120,104 +120,54 @@ const Profile = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Your Name</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.name}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.name}</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Email</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.email}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.email}</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Date of Birth</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.dob}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.dob}</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Username</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.username}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.username}</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Password</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">***********</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">***********</p>
             </div>
           </div>
 
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Present Address</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.presentAddress}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.presentAddress}</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Permanent Address</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.permanentAddress}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.permanentAddress}</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">City</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.city}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.city}</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Postal Code</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.postalCode}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.postalCode}</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-500 mb-1">Country</label>
-              <div className="flex items-center justify-between">
-                <p className="text-gray-800">{userData.country}</p>
-                <button className="text-indigo-600 hover:text-indigo-800">
-                  <FiEdit />
-                </button>
-              </div>
+              <p className="text-gray-800">{userData.country}</p>
             </div>
           </div>
         </div>
