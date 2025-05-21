@@ -1,20 +1,94 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiEdit, FiPlus } from "react-icons/fi";
 import AddTransactionModal from "../components/AddTransactionModal";
+import { LOCAL_STORAGE_KEYS } from "../utils/constants";
 
 const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const userData = {
-    name: "Charlene Reed",
-    email: "charlenereed@gmail.com",
-    dob: "25 January 1990",
-    username: "Charlene Reed",
-    presentAddress: "San Jose, California, USA",
-    permanentAddress: "San Jose, California, USA",
-    city: "San Jose",
-    postalCode: "45982",
-    country: "USA"
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID) || "1";
+        
+        const response = await fetch(`${import.meta.env.VITE_HASURA_API_URL}/profile`, {
+          method: "GET",
+          headers: {
+            "content-type": "application/json",
+            "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_SECRET,
+            "x-hasura-role": "user",
+            "x-hasura-user-id": userId
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.users && data.users.length > 0) {
+          const user = data.users[0];
+          setUserData({
+            name: user.name,
+            email: user.email,
+            dob: formatDate(user.date_of_birth),
+            username: user.name, // Assuming username is same as name
+            presentAddress: user.present_address || "Not provided",
+            permanentAddress: user.permanent_address || "Not provided",
+            city: user.city || "Not provided",
+            postalCode: user.postal_code || "Not provided",
+            country: user.country || "Not provided"
+          });
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching user data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "Not provided";
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  if (loading) {
+    return (
+      <div className="ml-64 p-8">
+        <div className="flex justify-center items-center h-64">
+          <p>Loading profile data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="ml-64 p-8">
+        <div className="flex justify-center items-center h-64">
+          <p className="text-red-500">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <div className="ml-64 p-8">
+        <div className="flex justify-center items-center h-64">
+          <p>No user data found</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="ml-64 p-8">
