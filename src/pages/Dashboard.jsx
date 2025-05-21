@@ -157,7 +157,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="ml-64 p-8 bg-[#F5F7FA]">
+    <div className="ml-64 p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Accounts</h1>
         <div className="flex items-center space-x-4">
