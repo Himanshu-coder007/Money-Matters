@@ -102,9 +102,9 @@ const Dashboard = () => {
 
         setBarData(completeBarData);
 
-        // Fetch last 3 transactions
+        // Fetch all transactions
         const transactionsResponse = await fetch(
-          `${API_URL}/all-transactions?limit=3&offset=2`,
+          `${API_URL}/all-transactions?limit=20&offset=12`,
           {
             method: "GET",
             headers: {
@@ -117,12 +117,12 @@ const Dashboard = () => {
         );
 
         const transactionsData = await transactionsResponse.json();
-
-        // Reverse the transactions array to show newest first
-        const reversedTransactions = [
-          ...(transactionsData.transactions || []),
-        ].reverse();
-        setTransactions(reversedTransactions);
+        
+        // Sort transactions by date and time in descending order (most recent first)
+        const sortedTransactions = [...(transactionsData.transactions || [])]
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+          
+        setTransactions(sortedTransactions);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to fetch data. Please try again later.");
@@ -286,83 +286,85 @@ const Dashboard = () => {
 
       <div className="bg-white p-6 rounded-xl shadow mb-8">
         <h2 className="text-xl font-semibold text-gray-700 mb-6">
-          Last Transactions
+          Recent Transactions
         </h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Transaction
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Category
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Date
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Amount
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {transactions.length > 0 ? (
-                transactions.map((transaction) => (
-                  <tr key={transaction.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {transaction.transaction_name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {transaction.category}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {format(parseISO(transaction.date), "dd MMM, hh:mm a")}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div
-                        className={`text-sm font-medium ${
-                          transaction.type === "credit"
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {transaction.type === "credit" ? "+" : "-"}$
-                        {transaction.amount.toLocaleString()}
-                      </div>
+          <div className="max-h-96 overflow-y-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50 sticky top-0">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Transaction
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Category
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Date
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {transactions.length > 0 ? (
+                  transactions.map((transaction) => (
+                    <tr key={transaction.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {transaction.transaction_name}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">
+                          {transaction.category}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">
+                          {format(parseISO(transaction.date), "dd MMM yyyy, hh:mm a")}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div
+                          className={`text-sm font-medium ${
+                            transaction.type === "credit"
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {transaction.type === "credit" ? "+" : "-"}$
+                          {transaction.amount.toLocaleString()}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="5"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
+                      No transactions found
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="5"
-                    className="px-6 py-4 text-center text-sm text-gray-500"
-                  >
-                    No transactions found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <AddTransactionModal
