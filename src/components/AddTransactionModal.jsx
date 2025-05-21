@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const AddTransactionModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -9,6 +9,23 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
     date: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Set current date and time when modal opens
+      const now = new Date();
+      // Format the date for the input field (YYYY-MM-DD)
+      const formattedDate = now.toISOString().split('T')[0];
+      // Format the time for display (HH:MM)
+      const formattedTime = now.toTimeString().substring(0, 5);
+      
+      setFormData(prev => ({
+        ...prev,
+        date: formattedDate,
+        time: formattedTime
+      }));
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -27,9 +44,9 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
     try {
       const userId = localStorage.getItem("userId") || 1; // Fallback to 1 if not found
       
-      // Format date properly for the API
-      const transactionDate = formData.date 
-        ? new Date(formData.date).toISOString()
+      // Combine date and time for the API
+      const transactionDateTime = formData.date && formData.time
+        ? new Date(`${formData.date}T${formData.time}`).toISOString()
         : new Date().toISOString();
 
       const response = await fetch(
@@ -47,8 +64,8 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
             type: formData.type,
             category: formData.category,
             amount: parseFloat(formData.amount),
-            date: transactionDate,
-            user_id:userId
+            date: transactionDateTime,
+            user_id: userId
           }),
         }
       );
@@ -68,6 +85,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
         category: "",
         amount: "",
         date: "",
+        time: ""
       });
     } catch (error) {
       console.error("Error adding transaction:", error);
@@ -133,7 +151,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
               <option value="transport">Transport</option>
               <option value="entertainment">Entertainment</option>
               <option value="transfer">Transfer</option>
-               <option value="education">Education</option>
+              <option value="education">Education</option>
             </select>
           </div>
           
@@ -152,16 +170,29 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+              <input
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+              />
+            </div>
           </div>
           
           <div className="mt-6 flex justify-end space-x-3">
