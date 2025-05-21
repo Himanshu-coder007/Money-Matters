@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { FiArrowUp, FiArrowDown, FiPlus } from "react-icons/fi";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import AddTransactionModal from "../components/AddTransactionModal";
-import { format, parseISO } from 'date-fns';
+import { format, parseISO } from "date-fns";
 
 const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,22 +35,26 @@ const Dashboard = () => {
       try {
         // Fetch credit and debit totals
         const totalsResponse = await fetch(`${API_URL}/credit-debit-totals`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'x-hasura-admin-secret': ADMIN_SECRET,
-            'x-hasura-role': 'user',
-            'x-hasura-user-id': userId.toString()
-          }
+            "Content-Type": "application/json",
+            "x-hasura-admin-secret": ADMIN_SECRET,
+            "x-hasura-role": "user",
+            "x-hasura-user-id": userId.toString(),
+          },
         });
-        
+
         const totalsData = await totalsResponse.json();
-        const creditData = totalsData.totals_credit_debit_transactions.find(t => t.type === 'credit');
-        const debitData = totalsData.totals_credit_debit_transactions.find(t => t.type === 'debit');
-        
+        const creditData = totalsData.totals_credit_debit_transactions.find(
+          (t) => t.type === "credit"
+        );
+        const debitData = totalsData.totals_credit_debit_transactions.find(
+          (t) => t.type === "debit"
+        );
+
         setCreditTotal(creditData?.sum || 0);
         setDebitTotal(debitData?.sum || 0);
-        
+
         setPieData([
           { name: "Credit", value: creditData?.sum || 0 },
           { name: "Debit", value: debitData?.sum || 0 },
@@ -47,76 +62,67 @@ const Dashboard = () => {
 
         // Fetch last 7 days transactions
         const weekResponse = await fetch(`${API_URL}/daywise-totals-7-days`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'x-hasura-admin-secret': ADMIN_SECRET,
-            'x-hasura-role': 'user',
-            'x-hasura-user-id': userId.toString()
-          }
+            "Content-Type": "application/json",
+            "x-hasura-admin-secret": ADMIN_SECRET,
+            "x-hasura-role": "user",
+            "x-hasura-user-id": userId.toString(),
+          },
         });
-        
+
         const weekTransactionsData = await weekResponse.json();
-        
+
         // Group by day and calculate totals
         const groupedByDay = {};
-        weekTransactionsData.last_7_days_transactions_credit_debit_totals.forEach(transaction => {
-          const date = new Date(transaction.date);
-          const day = format(date, 'EEE'); // Short day name (Mon, Tue, etc.)
-          
-          if (!groupedByDay[day]) {
-            groupedByDay[day] = { credit: 0, debit: 0 };
+        weekTransactionsData.last_7_days_transactions_credit_debit_totals.forEach(
+          (transaction) => {
+            const date = new Date(transaction.date);
+            const day = format(date, "EEE"); // Short day name (Mon, Tue, etc.)
+
+            if (!groupedByDay[day]) {
+              groupedByDay[day] = { credit: 0, debit: 0 };
+            }
+
+            if (transaction.type === "credit") {
+              groupedByDay[day].credit += transaction.sum;
+            } else {
+              groupedByDay[day].debit += transaction.sum;
+            }
           }
-          
-          if (transaction.type === 'credit') {
-            groupedByDay[day].credit += transaction.sum;
-          } else {
-            groupedByDay[day].debit += transaction.sum;
-          }
-        });
+        );
 
         // Fill in missing days with zeros
-        const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const completeBarData = daysOfWeek.map(day => ({
+        const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        const completeBarData = daysOfWeek.map((day) => ({
           name: day,
           credit: groupedByDay[day]?.credit || 0,
-          debit: groupedByDay[day]?.debit || 0
+          debit: groupedByDay[day]?.debit || 0,
         }));
-        
+
         setBarData(completeBarData);
 
-        // Fetch last transactions
-        const transactionsResponse = await fetch(`${API_URL}/transactions`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-hasura-admin-secret': ADMIN_SECRET,
-            'x-hasura-role': 'user',
-            'x-hasura-user-id': userId.toString()
+        // Fetch last 3 transactions
+        const transactionsResponse = await fetch(
+          `${API_URL}/all-transactions?limit=3&offset=2`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "x-hasura-admin-secret": ADMIN_SECRET,
+              "x-hasura-role": "user",
+              "x-hasura-user-id": userId.toString(),
+            },
           }
-        });
-        
-        const lastTransactionsData = await transactionsResponse.json();
-        
-        // Format transactions data
-        const formattedTransactions = lastTransactionsData.transactions
-          ?.map(transaction => ({
-            id: transaction.id,
-            name: transaction.transaction_name || 'Unnamed Transaction',
-            category: transaction.category || '',
-            person: transaction.person || '',
-            date: format(parseISO(transaction.date), 'dd MMM, hh:mm a'),
-            amount: transaction.type === 'credit' ? transaction.amount : -transaction.amount,
-            checked: false
-          }))
-          ?.sort((a, b) => new Date(b.date) - new Date(a.date))
-          ?.slice(0, 3) || []; // Get last 3 transactions
-        
-        setTransactions(formattedTransactions);
+        );
 
+        const transactionsData = await transactionsResponse.json();
+
+        // Set raw transactions data without formatting
+        setTransactions(transactionsData.transactions || []);
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to fetch data. Please try again later.');
+        console.error("Error fetching data:", err);
+        setError("Failed to fetch data. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -136,7 +142,10 @@ const Dashboard = () => {
   if (error) {
     return (
       <div className="ml-64 p-8">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          role="alert"
+        >
           <strong className="font-bold">Error: </strong>
           <span className="block sm:inline">{error}</span>
         </div>
@@ -149,7 +158,7 @@ const Dashboard = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Accounts</h1>
         <div className="flex items-center space-x-4">
-          <button 
+          <button
             className="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             onClick={() => setIsModalOpen(true)}
           >
@@ -167,7 +176,9 @@ const Dashboard = () => {
               <FiArrowUp />
             </div>
           </div>
-          <p className="text-3xl font-bold text-gray-800">${creditTotal.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-gray-800">
+            ${creditTotal.toLocaleString()}
+          </p>
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow">
@@ -177,16 +188,32 @@ const Dashboard = () => {
               <FiArrowDown />
             </div>
           </div>
-          <p className="text-3xl font-bold text-gray-800">${debitTotal.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-gray-800">
+            ${debitTotal.toLocaleString()}
+          </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow lg:col-span-2">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Debit & Credit Overview</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">
+            Debit & Credit Overview
+          </h2>
           <p className="text-gray-600 mb-6">
-            <span className="font-semibold text-red-500">${barData.reduce((sum, day) => sum + day.debit, 0).toLocaleString()}</span> Debited &{" "}
-            <span className="font-semibold text-green-500">${barData.reduce((sum, day) => sum + day.credit, 0).toLocaleString()}</span> Credited in this Week
+            <span className="font-semibold text-red-500">
+              $
+              {barData
+                .reduce((sum, day) => sum + day.debit, 0)
+                .toLocaleString()}
+            </span>{" "}
+            Debited &{" "}
+            <span className="font-semibold text-green-500">
+              $
+              {barData
+                .reduce((sum, day) => sum + day.credit, 0)
+                .toLocaleString()}
+            </span>{" "}
+            Credited in this Week
           </p>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -203,7 +230,9 @@ const Dashboard = () => {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Balance Distribution</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">
+            Balance Distribution
+          </h2>
           <div className="h-48 mb-4">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -218,10 +247,18 @@ const Dashboard = () => {
                   dataKey="value"
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, pieData.find(d => d.value === value)?.name]} />
+                <Tooltip
+                  formatter={(value) => [
+                    `$${value.toLocaleString()}`,
+                    pieData.find((d) => d.value === value)?.name,
+                  ]}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -229,49 +266,75 @@ const Dashboard = () => {
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
               <span className="text-gray-600">Credit</span>
-              <span className="ml-auto font-semibold">${creditTotal.toLocaleString()}</span>
+              <span className="ml-auto font-semibold">
+                ${creditTotal.toLocaleString()}
+              </span>
             </div>
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full bg-red-400 mr-2"></div>
               <span className="text-gray-600">Debit</span>
-              <span className="ml-auto font-semibold">${debitTotal.toLocaleString()}</span>
+              <span className="ml-auto font-semibold">
+                ${debitTotal.toLocaleString()}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow mb-8">
-        <h2 className="text-xl font-semibold text-gray-700 mb-6">Last Transaction</h2>
+        <h2 className="text-xl font-semibold text-gray-700 mb-6">
+          Last Transactions
+        </h2>
         <div className="space-y-4">
           {transactions.length > 0 ? (
             transactions.map((transaction) => (
-              <div key={transaction.id} className="flex items-center p-3 hover:bg-gray-50 rounded-lg">
+              <div
+                key={transaction.id}
+                className="flex items-center p-3 hover:bg-gray-50 rounded-lg"
+              >
                 <input
                   type="checkbox"
-                  checked={transaction.checked}
+                  checked={false}
                   onChange={() => {}}
                   className="h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 mr-4"
                 />
                 <div className="flex-1">
-                  <h3 className="font-medium text-gray-800">{transaction.name}</h3>
+                  <h3 className="font-medium text-gray-800">
+                    {transaction.transaction_name}
+                  </h3>
                   <p className="text-sm text-gray-500">
-                    {transaction.category} {transaction.person && `• ${transaction.person}`}
+                    {transaction.category}{" "}
+                    {transaction.person && `• ${transaction.person}`}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-500">{transaction.date}</p>
-                  <p className={`font-medium ${transaction.amount > 0 ? "text-green-500" : "text-red-500"}`}>
-                    {transaction.amount > 0 ? "+" : ""}${Math.abs(transaction.amount).toLocaleString()}
+                  <p className="text-sm text-gray-500">
+                    {format(parseISO(transaction.date), "dd MMM, hh:mm a")}
+                  </p>
+                  <p
+                    className={`font-medium ${
+                      transaction.type === "credit"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {transaction.type === "credit" ? "+" : "-"}$
+                    {transaction.amount.toLocaleString()}
                   </p>
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-center py-4 text-gray-500">No transactions found</div>
+            <div className="text-center py-4 text-gray-500">
+              No transactions found
+            </div>
           )}
         </div>
       </div>
-      <AddTransactionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AddTransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };
