@@ -60,6 +60,11 @@ const Profile = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const getInitial = () => {
+    if (!userData?.name) return "U";
+    return userData.name.charAt(0).toUpperCase();
+  };
+
   if (loading) {
     return (
       <div className="ml-64 p-8">
@@ -104,7 +109,10 @@ const Profile = () => {
       </div>
 
       <div className="bg-white rounded-xl shadow overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 flex items-center">
+          <div className="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xl font-bold mr-4">
+            {getInitial()}
+          </div>
           <h2 className="text-xl font-semibold text-gray-800">Personal Information</h2>
         </div>
 
