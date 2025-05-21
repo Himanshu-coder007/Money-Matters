@@ -14,7 +14,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const COLORS = ["#4f46e5", "#f87171"];
+  const COLORS = ["#FC9826", "#05939E"];
   const API_URL = import.meta.env.VITE_HASURA_API_URL;
   const ADMIN_SECRET = import.meta.env.VITE_HASURA_ADMIN_SECRET;
   const userId = localStorage.getItem("userId") || 1;
@@ -145,7 +145,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="ml-64 p-8">
+    <div className="ml-64 p-8 bg-[#F5F7FA]">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Accounts</h1>
         <div className="flex items-center space-x-4">
@@ -195,8 +195,8 @@ const Dashboard = () => {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="credit" fill="#4f46e5" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="debit" fill="#f87171" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="credit" fill="#FC9826" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="debit" fill="#05939E" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

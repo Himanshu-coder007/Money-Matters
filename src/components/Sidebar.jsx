@@ -14,15 +14,19 @@ const Sidebar = () => {
 
   return (
     <div className="w-64 bg-white h-screen shadow-lg fixed">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-indigo-600">Money Matters</h1>
+      <div className="p-6 flex justify-center">
+        <img 
+          src="/logo.png" 
+          alt="Money Matters Logo" 
+          className="h-12 object-contain" 
+        />
       </div>
       <nav className="mt-10 px-6">
         <NavLink
           to="/"
           className={({ isActive }) =>
-            `flex items-center py-3 px-4 rounded-lg mb-2 ${
-              isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-100"
+            `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+              isActive ? "bg-gray-100 text-purple-600" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
             }`
           }
         >
@@ -32,8 +36,8 @@ const Sidebar = () => {
         <NavLink
           to="/transactions"
           className={({ isActive }) =>
-            `flex items-center py-3 px-4 rounded-lg mb-2 ${
-              isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-100"
+            `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+              isActive ? "bg-gray-100 text-purple-600" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
             }`
           }
         >
@@ -43,8 +47,8 @@ const Sidebar = () => {
         <NavLink
           to="/profile"
           className={({ isActive }) =>
-            `flex items-center py-3 px-4 rounded-lg mb-2 ${
-              isActive ? "bg-indigo-50 text-indigo-600" : "text-gray-600 hover:bg-gray-100"
+            `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+              isActive ? "bg-gray-100 text-purple-600" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
             }`
           }
         >
@@ -52,13 +56,13 @@ const Sidebar = () => {
           <span>Profile</span>
         </NavLink>
         <div className="border-t border-gray-200 mt-6 pt-6">
-          <button className="flex items-center w-full py-3 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
+          <button className="flex items-center w-full py-3 px-4 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-purple-600 transition-colors duration-200">
             <FiSettings className="mr-3" />
             <span>Settings</span>
           </button>
           <button 
             onClick={handleLogout}
-            className="flex items-center w-full py-3 px-4 rounded-lg text-gray-600 hover:bg-gray-100"
+            className="flex items-center w-full py-3 px-4 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-purple-600 transition-colors duration-200"
           >
             <FiLogOut className="mr-3" />
             <span>Logout</span>
