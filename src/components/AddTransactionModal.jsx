@@ -133,6 +133,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
               <option value="transport">Transport</option>
               <option value="entertainment">Entertainment</option>
               <option value="transfer">Transfer</option>
+               <option value="education">Education</option>
             </select>
           </div>
           

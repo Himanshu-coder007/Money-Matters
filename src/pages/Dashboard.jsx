@@ -118,8 +118,11 @@ const Dashboard = () => {
 
         const transactionsData = await transactionsResponse.json();
 
-        // Set raw transactions data without formatting
-        setTransactions(transactionsData.transactions || []);
+        // Reverse the transactions array to show newest first
+        const reversedTransactions = [
+          ...(transactionsData.transactions || []),
+        ].reverse();
+        setTransactions(reversedTransactions);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to fetch data. Please try again later.");
@@ -285,50 +288,81 @@ const Dashboard = () => {
         <h2 className="text-xl font-semibold text-gray-700 mb-6">
           Last Transactions
         </h2>
-        <div className="space-y-4">
-          {transactions.length > 0 ? (
-            transactions.map((transaction) => (
-              <div
-                key={transaction.id}
-                className="flex items-center p-3 hover:bg-gray-50 rounded-lg"
-              >
-                <input
-                  type="checkbox"
-                  checked={false}
-                  onChange={() => {}}
-                  className="h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500 mr-4"
-                />
-                <div className="flex-1">
-                  <h3 className="font-medium text-gray-800">
-                    {transaction.transaction_name}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {transaction.category}{" "}
-                    {transaction.person && `• ${transaction.person}`}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">
-                    {format(parseISO(transaction.date), "dd MMM, hh:mm a")}
-                  </p>
-                  <p
-                    className={`font-medium ${
-                      transaction.type === "credit"
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Transaction
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Category
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Date
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Amount
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {transactions.length > 0 ? (
+                transactions.map((transaction) => (
+                  <tr key={transaction.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {transaction.transaction_name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {transaction.category}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500">
+                        {format(parseISO(transaction.date), "dd MMM, hh:mm a")}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div
+                        className={`text-sm font-medium ${
+                          transaction.type === "credit"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {transaction.type === "credit" ? "+" : "-"}$
+                        {transaction.amount.toLocaleString()}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="px-6 py-4 text-center text-sm text-gray-500"
                   >
-                    {transaction.type === "credit" ? "+" : "-"}$
-                    {transaction.amount.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-4 text-gray-500">
-              No transactions found
-            </div>
-          )}
+                    No transactions found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
       <AddTransactionModal
