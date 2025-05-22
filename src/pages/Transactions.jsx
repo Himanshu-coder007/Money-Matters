@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { FiDownload, FiFilter, FiSearch, FiChevronDown, FiChevronUp, FiPlus } from "react-icons/fi";
+import { FiDownload, FiFilter, FiSearch, FiChevronDown, FiChevronUp, FiPlus, FiTrash2, FiEdit } from "react-icons/fi";
 import AddTransactionModal from "../components/AddTransactionModal";
+import EditTransactionModal from "../components/EditTransactionModal";
 import { LOCAL_STORAGE_KEYS } from "../utils/constants";
 
 const Transactions = () => {
@@ -8,6 +9,8 @@ const Transactions = () => {
   const [sortConfig, setSortConfig] = useState({ key: "date", direction: "desc" });
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -86,7 +89,7 @@ const Transactions = () => {
     setError(null);
     try {
       const url = `${API_BASE_URL}/all-transactions?limit=${pagination.limit}&offset=${pagination.offset}`;
-      console.log("API Request URL:", url); // Debug log
+      console.log("API Request URL:", url);
 
       const response = await fetch(url, {
         method: "GET",
@@ -99,7 +102,7 @@ const Transactions = () => {
       });
 
       const responseText = await response.text();
-      console.log("API Response:", responseText); // Debug log
+      console.log("API Response:", responseText);
 
       try {
         const data = JSON.parse(responseText);
@@ -175,6 +178,75 @@ const Transactions = () => {
     setTotals({ credit: creditTotal, debit: debitTotal });
   };
 
+  const deleteTransaction = async (transactionId) => {
+    if (!window.confirm("Are you sure you want to delete this transaction?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/delete-transaction`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "x-hasura-admin-secret": ADMIN_SECRET,
+          "x-hasura-role": "user",
+          "x-hasura-user-id": userId.toString(),
+        },
+        body: JSON.stringify({ id: transactionId.toString() }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete transaction: ${response.status}`);
+      }
+
+      // Refresh transactions after deletion
+      await fetchTransactions();
+      await fetchLast7DaysTotals();
+    } catch (err) {
+      console.error("Error deleting transaction:", err);
+      alert("Failed to delete transaction. Please try again.");
+    }
+  };
+
+  const handleEditTransaction = (transaction) => {
+    setSelectedTransaction(transaction);
+    setIsEditModalOpen(true);
+  };
+
+  const updateTransaction = async (updatedTransaction) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/update-transaction`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-hasura-admin-secret": ADMIN_SECRET,
+          "x-hasura-role": "user",
+          "x-hasura-user-id": userId.toString(),
+        },
+        body: JSON.stringify({
+          id: updatedTransaction.id,
+          name: updatedTransaction.transaction_name,
+          type: updatedTransaction.type,
+          category: updatedTransaction.category,
+          amount: updatedTransaction.amount,
+          date: updatedTransaction.date,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update transaction: ${response.status}`);
+      }
+
+      // Refresh transactions after update
+      await fetchTransactions();
+      await fetchLast7DaysTotals();
+      setIsEditModalOpen(false);
+    } catch (err) {
+      console.error("Error updating transaction:", err);
+      alert("Failed to update transaction. Please try again.");
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -205,7 +277,6 @@ const Transactions = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-gray-500">Total Credit</h3>
           <p className="text-2xl font-bold text-green-600">
@@ -311,6 +382,12 @@ const Transactions = () => {
                     {getSortIcon("amount")}
                   </div>
                 </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -336,6 +413,24 @@ const Transactions = () => {
                       }`}
                     >
                       {transaction.type === "credit" ? "+" : "-"}${Math.abs(transaction.amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEditTransaction(transaction)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                        title="Edit"
+                      >
+                        <FiEdit />
+                      </button>
+                      <button
+                        onClick={() => deleteTransaction(transaction.id)}
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete"
+                      >
+                        <FiTrash2 />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -388,6 +483,15 @@ const Transactions = () => {
           fetchLast7DaysTotals();
         }}
       />
+
+      {selectedTransaction && (
+        <EditTransactionModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          transaction={selectedTransaction}
+          onSave={updateTransaction}
+        />
+      )}
     </div>
   );
 };
