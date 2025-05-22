@@ -13,59 +13,61 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-64 bg-white h-screen shadow-lg fixed">
-      <div className="p-6 flex justify-center">
+    <div className="w-64 bg-gray-900 h-screen shadow-xl fixed flex flex-col">
+      <div className="p-6 flex justify-center border-b border-gray-700">
         <img 
           src="/logo.png" 
           alt="Money Matters Logo" 
           className="h-12 object-contain" 
         />
       </div>
-      <nav className="mt-10 px-6">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
-              isActive ? "bg-gray-100 text-purple-600" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
-            }`
-          }
-        >
-          <FiHome className="mr-3" />
-          <span>Dashboard</span>
-        </NavLink>
-        <NavLink
-          to="/transactions"
-          className={({ isActive }) =>
-            `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
-              isActive ? "bg-gray-100 text-purple-600" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
-            }`
-          }
-        >
-          <FiPieChart className="mr-3" />
-          <span>Transactions</span>
-        </NavLink>
-        <NavLink
-          to="/profile"
-          className={({ isActive }) =>
-            `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
-              isActive ? "bg-gray-100 text-purple-600" : "text-gray-600 hover:bg-gray-100 hover:text-purple-600"
-            }`
-          }
-        >
-          <FiUser className="mr-3" />
-          <span>Profile</span>
-        </NavLink>
-        <div className="border-t border-gray-200 mt-6 pt-6">
-          <button className="flex items-center w-full py-3 px-4 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-purple-600 transition-colors duration-200">
-            <FiSettings className="mr-3" />
-            <span>Settings</span>
+      <nav className="flex-1 flex flex-col justify-between px-4 py-6">
+        <div>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+                isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+              }`
+            }
+          >
+            <FiHome className="mr-3 text-lg" />
+            <span className="font-medium">Dashboard</span>
+          </NavLink>
+          <NavLink
+            to="/transactions"
+            className={({ isActive }) =>
+              `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+                isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+              }`
+            }
+          >
+            <FiPieChart className="mr-3 text-lg" />
+            <span className="font-medium">Transactions</span>
+          </NavLink>
+          <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+                isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+              }`
+            }
+          >
+            <FiUser className="mr-3 text-lg" />
+            <span className="font-medium">Profile</span>
+          </NavLink>
+        </div>
+        <div className="border-t border-gray-700 pt-4">
+          <button className="flex items-center w-full py-3 px-4 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200">
+            <FiSettings className="mr-3 text-lg" />
+            <span className="font-medium">Settings</span>
           </button>
           <button 
             onClick={handleLogout}
-            className="flex items-center w-full py-3 px-4 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-purple-600 transition-colors duration-200"
+            className="flex items-center w-full py-3 px-4 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 mt-2"
           >
-            <FiLogOut className="mr-3" />
-            <span>Logout</span>
+            <FiLogOut className="mr-3 text-lg" />
+            <span className="font-medium">Logout</span>
           </button>
         </div>
       </nav>
