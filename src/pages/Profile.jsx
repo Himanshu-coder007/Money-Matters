@@ -198,7 +198,7 @@ const Profile = () => {
 
           {/* Address Information */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+            <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 h-full">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-medium text-gray-800">Address Information</h2>
@@ -261,29 +261,6 @@ const Profile = () => {
                     </div>
                     <p className="text-gray-800 pl-8">{userData.country}</p>
                   </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Additional Section (can be used for other info) */}
-            <div className="mt-6 bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-800">Account Details</h2>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Member since</span>
-                  <span className="text-gray-800">Jan 2023</span>
-                </div>
-                <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                  <span className="text-gray-500">Last login</span>
-                  <span className="text-gray-800">2 hours ago</span>
-                </div>
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-gray-500">Account status</span>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Active
-                  </span>
                 </div>
               </div>
             </div>
