@@ -162,7 +162,7 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold text-gray-800">Accounts</h1>
         <div className="flex items-center space-x-4">
           <button
-            className="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            className="flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
             onClick={() => setIsModalOpen(true)}
           >
             <FiPlus className="mr-2" />
@@ -172,28 +172,50 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow">
+        {/* Credit Card */}
+        <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-700">Credit</h2>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-700">Credit</h2>
+              <p className="text-sm text-gray-500">Total credit amount</p>
+            </div>
             <div className="p-2 rounded-lg bg-green-100 text-green-600">
               <FiArrowUp />
             </div>
           </div>
-          <p className="text-3xl font-bold text-gray-800">
-            ${creditTotal.toLocaleString()}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-3xl font-bold text-gray-800">
+              ${creditTotal.toLocaleString()}
+            </p>
+            <img 
+              src="/credit.png" 
+              alt="Credit Card" 
+              className="h-16 object-contain" 
+            />
+          </div>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
+        {/* Debit Card */}
+        <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-500">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-700">Debit</h2>
+            <div>
+              <h2 className="text-xl font-semibold text-gray-700">Debit</h2>
+              <p className="text-sm text-gray-500">Total debit amount</p>
+            </div>
             <div className="p-2 rounded-lg bg-red-100 text-red-600">
               <FiArrowDown />
             </div>
           </div>
-          <p className="text-3xl font-bold text-gray-800">
-            ${debitTotal.toLocaleString()}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-3xl font-bold text-gray-800">
+              ${debitTotal.toLocaleString()}
+            </p>
+            <img 
+              src="/debit.png" 
+              alt="Debit Card" 
+              className="h-16 object-contain" 
+            />
+          </div>
         </div>
       </div>
 
