@@ -214,38 +214,42 @@ const Transactions = () => {
   };
 
   const updateTransaction = async (updatedTransaction) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/update-transaction`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-hasura-admin-secret": ADMIN_SECRET,
-          "x-hasura-role": "user",
-          "x-hasura-user-id": userId.toString(),
-        },
-        body: JSON.stringify({
-          id: updatedTransaction.id,
-          name: updatedTransaction.transaction_name,
-          type: updatedTransaction.type,
-          category: updatedTransaction.category,
-          amount: updatedTransaction.amount,
-          date: updatedTransaction.date,
-        }),
-      });
+  try {
+    // Get current date and time in ISO format (YYYY-MM-DDTHH:MM:SS)
+    const now = new Date();
+    const currentDateTime = now.toISOString();
+    
+    const response = await fetch(`${API_BASE_URL}/update-transaction`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret": ADMIN_SECRET,
+        "x-hasura-role": "user",
+        "x-hasura-user-id": userId.toString(),
+      },
+      body: JSON.stringify({
+        id: updatedTransaction.id,
+        name: updatedTransaction.transaction_name,
+        type: updatedTransaction.type,
+        category: updatedTransaction.category,
+        amount: updatedTransaction.amount,
+        date: currentDateTime, // Use current date/time instead of the original date
+      }),
+    });
 
-      if (!response.ok) {
-        throw new Error(`Failed to update transaction: ${response.status}`);
-      }
-
-      // Refresh transactions after update
-      await fetchTransactions();
-      await fetchLast7DaysTotals();
-      setIsEditModalOpen(false);
-    } catch (err) {
-      console.error("Error updating transaction:", err);
-      alert("Failed to update transaction. Please try again.");
+    if (!response.ok) {
+      throw new Error(`Failed to update transaction: ${response.status}`);
     }
-  };
+
+    // Refresh transactions after update
+    await fetchTransactions();
+    await fetchLast7DaysTotals();
+    setIsEditModalOpen(false);
+  } catch (err) {
+    console.error("Error updating transaction:", err);
+    alert("Failed to update transaction. Please try again.");
+  }
+};
 
   useEffect(() => {
     const fetchData = async () => {
