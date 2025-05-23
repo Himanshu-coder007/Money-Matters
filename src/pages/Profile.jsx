@@ -125,7 +125,7 @@ const Profile = () => {
             <p className="text-gray-500 mt-1">Manage your personal information</p>
           </div>
           <button 
-            className="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+            className="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg cursor-pointer"
             onClick={() => setIsModalOpen(true)}
           >
             <FiPlus className="mr-2" />
