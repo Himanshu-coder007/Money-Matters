@@ -58,10 +58,7 @@ const Sidebar = () => {
           </NavLink>
         </div>
         <div className="border-t border-gray-700 pt-4">
-          <button className="flex items-center w-full py-3 px-4 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200">
-            <FiSettings className="mr-3 text-lg" />
-            <span className="font-medium">Settings</span>
-          </button>
+          
           <button 
             onClick={handleLogout}
             className="flex items-center w-full py-3 px-4 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 mt-2"
