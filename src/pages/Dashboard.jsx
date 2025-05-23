@@ -491,7 +491,7 @@ const Dashboard = () => {
             <p className="text-gray-600">Your latest financial activities</p>
           </div>
           <button
-            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium cursor-pointer"
             onClick={() => navigate("/transactions")}
           >
             View All Transactions
