@@ -275,6 +275,40 @@ const Transactions = () => {
     );
   };
 
+  // Function to export data to CSV
+  const exportToCSV = () => {
+    // Prepare CSV content
+    const headers = ["Name", "Category", "Type", "Amount", "Date"];
+    const csvRows = [];
+    
+    // Add headers
+    csvRows.push(headers.join(','));
+    
+    // Add data rows
+    filteredTransactions.forEach(transaction => {
+      const row = [
+        `"${transaction.transaction_name.replace(/"/g, '""')}"`,
+        `"${transaction.category.replace(/"/g, '""')}"`,
+        `"${transaction.type}"`,
+        transaction.amount,
+        `"${formatDate(transaction.date)}"`
+      ];
+      csvRows.push(row.join(','));
+    });
+    
+    // Create CSV file
+    const csvContent = csvRows.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `transactions_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -486,6 +520,18 @@ const Transactions = () => {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Export Button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={exportToCSV}
+              className="flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-all"
+              disabled={filteredTransactions.length === 0}
+            >
+              <FiDownload className="mr-2 text-gray-500" />
+              <span className="text-sm">Export CSV</span>
+            </motion.button>
           </div>
         </div>
 
