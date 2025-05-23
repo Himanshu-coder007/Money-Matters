@@ -138,21 +138,15 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select 
+            <input
+              type="text"
               name="category"
               value={formData.category}
               onChange={handleChange}
+              placeholder="Enter category (e.g., Shopping, Food)"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
-            >
-              <option value="">Select</option>
-              <option value="shopping">Shopping</option>
-              <option value="food">Food</option>
-              <option value="transport">Transport</option>
-              <option value="entertainment">Entertainment</option>
-              <option value="transfer">Transfer</option>
-              <option value="education">Education</option>
-            </select>
+            />
           </div>
           
           <div>
