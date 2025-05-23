@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiPlus, FiEdit2, FiUser, FiMail, FiCalendar, FiHome, FiMapPin, FiLock } from "react-icons/fi";
+import { FiPlus, FiUser, FiMail, FiCalendar, FiHome, FiMapPin, FiLock } from "react-icons/fi";
 import AddTransactionModal from "../components/AddTransactionModal";
 import { LOCAL_STORAGE_KEYS } from "../utils/constants";
 
@@ -145,12 +145,7 @@ const Profile = () => {
             </div>
             
             <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-medium text-gray-800">Personal Info</h3>
-                <button className="text-indigo-600 hover:text-indigo-800 flex items-center text-sm">
-                  <FiEdit2 className="mr-1" /> Edit
-                </button>
-              </div>
+              <h3 className="text-lg font-medium text-gray-800 mb-6">Personal Info</h3>
               
               <div className="space-y-4">
                 <div className="flex items-start">
@@ -200,12 +195,7 @@ const Profile = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 h-full">
               <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-medium text-gray-800">Address Information</h2>
-                  <button className="text-indigo-600 hover:text-indigo-800 flex items-center text-sm">
-                    <FiEdit2 className="mr-1" /> Edit
-                  </button>
-                </div>
+                <h2 className="text-lg font-medium text-gray-800">Address Information</h2>
               </div>
               
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
