@@ -17,6 +17,7 @@ const Transactions = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ limit: 100, offset: 0, total: 0 });
+  const [clientPagination, setClientPagination] = useState({ limit: 10, offset: 0 });
   const [totals, setTotals] = useState({ credit: 0, debit: 0 });
   const [last7DaysTotals, setLast7DaysTotals] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -62,6 +63,12 @@ const Transactions = () => {
       return 0;
     });
 
+  // Get current transactions for the current page
+  const currentTransactions = filteredTransactions.slice(
+    clientPagination.offset,
+    clientPagination.offset + clientPagination.limit
+  );
+
   const requestSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -83,12 +90,12 @@ const Transactions = () => {
 
   const handlePagination = (direction) => {
     if (direction === "next") {
-      setPagination(prev => ({
+      setClientPagination(prev => ({
         ...prev,
         offset: prev.offset + prev.limit
       }));
     } else {
-      setPagination(prev => ({
+      setClientPagination(prev => ({
         ...prev,
         offset: Math.max(0, prev.offset - prev.limit)
       }));
@@ -281,6 +288,11 @@ const Transactions = () => {
     fetchData();
   }, [pagination.offset, pagination.limit]);
 
+  // Reset client pagination when filters change
+  useEffect(() => {
+    setClientPagination({ limit: 10, offset: 0 });
+  }, [activeTab, searchTerm, selectedCategories, sortConfig]);
+
   // Prepare data for the chart
   const chartData = last7DaysTotals.reduce((acc, item) => {
     const date = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -391,8 +403,6 @@ const Transactions = () => {
           </div>
         </motion.div>
       </div>
-
-     
 
       {/* Transaction Table Section */}
       <div className="bg-white rounded-xl shadow overflow-hidden">
@@ -547,7 +557,7 @@ const Transactions = () => {
                     Error loading transactions: {error}
                   </td>
                 </tr>
-              ) : filteredTransactions.length === 0 ? (
+              ) : currentTransactions.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
                     <div className="flex flex-col items-center">
@@ -561,7 +571,7 @@ const Transactions = () => {
                 </tr>
               ) : (
                 <AnimatePresence>
-                  {filteredTransactions.map((transaction) => (
+                  {currentTransactions.map((transaction) => (
                     <motion.tr 
                       key={transaction.id}
                       initial={{ opacity: 0 }}
@@ -625,23 +635,23 @@ const Transactions = () => {
           <div className="flex-1 flex justify-between items-center">
             <button
               onClick={() => handlePagination("prev")}
-              disabled={pagination.offset === 0}
+              disabled={clientPagination.offset === 0}
               className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md transition-all ${
-                pagination.offset === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 hover:shadow-sm"
+                clientPagination.offset === 0 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 hover:shadow-sm"
               }`}
             >
               Previous
             </button>
             <span className="text-sm text-gray-700">
-              Showing <span className="font-medium">{pagination.offset + 1}</span> to{" "}
-              <span className="font-medium">{Math.min(pagination.offset + pagination.limit, pagination.total)}</span> of{" "}
-              <span className="font-medium">{pagination.total}</span>
+              Showing <span className="font-medium">{clientPagination.offset + 1}</span> to{" "}
+              <span className="font-medium">{Math.min(clientPagination.offset + clientPagination.limit, filteredTransactions.length)}</span> of{" "}
+              <span className="font-medium">{filteredTransactions.length}</span> results
             </span>
             <button
               onClick={() => handlePagination("next")}
-              disabled={pagination.offset + pagination.limit >= pagination.total}
+              disabled={clientPagination.offset + clientPagination.limit >= filteredTransactions.length}
               className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md transition-all ${
-                pagination.offset + pagination.limit >= pagination.total ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 hover:shadow-sm"
+                clientPagination.offset + clientPagination.limit >= filteredTransactions.length ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-white text-gray-700 hover:bg-gray-50 hover:shadow-sm"
               }`}
             >
               Next
