@@ -17,6 +17,7 @@ import AddTransactionModal from "../components/AddTransactionModal";
 import { format, parseISO } from "date-fns";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,6 +34,8 @@ const Dashboard = () => {
   const API_URL = import.meta.env.VITE_HASURA_API_URL;
   const ADMIN_SECRET = import.meta.env.VITE_HASURA_ADMIN_SECRET;
   const userId = localStorage.getItem("userId") || 1;
+  
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     try {
@@ -429,7 +432,7 @@ const Dashboard = () => {
           </div>
           <button
             className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => navigate("/transactions")}
           >
             View All Transactions
           </button>
