@@ -107,7 +107,7 @@ const Transactions = () => {
     setError(null);
     try {
       const url = `${API_BASE_URL}/all-transactions?limit=${pagination.limit}&offset=${pagination.offset}`;
-      console.log("API Request URL:", url);
+     
 
       const response = await fetch(url, {
         method: "GET",
@@ -120,7 +120,7 @@ const Transactions = () => {
       });
 
       const responseText = await response.text();
-      console.log("API Response:", responseText);
+    
 
       try {
         const data = JSON.parse(responseText);
@@ -384,9 +384,7 @@ const Transactions = () => {
               </svg>
             </div>
           </div>
-          <div className="mt-4 text-sm text-green-600">
-            <span className="font-medium">↑ 12%</span> from last month
-          </div>
+         
         </motion.div>
 
         <motion.div 
@@ -408,9 +406,7 @@ const Transactions = () => {
               </svg>
             </div>
           </div>
-          <div className="mt-4 text-sm text-red-600">
-            <span className="font-medium">↑ 8%</span> from last month
-          </div>
+          
         </motion.div>
 
         <motion.div 
@@ -432,9 +428,7 @@ const Transactions = () => {
               </svg>
             </div>
           </div>
-          <div className="mt-4 text-sm text-indigo-600">
-            <span className="font-medium">↑ 4%</span> from last month
-          </div>
+         
         </motion.div>
       </div>
 
