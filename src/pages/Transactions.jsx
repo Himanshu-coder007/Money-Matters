@@ -151,38 +151,38 @@ const Transactions = () => {
     }
   };
 
-  const fetchLast7DaysTotals = async () => {
-    try {
-      const url = `${API_BASE_URL}/all-transactions?days=7`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "x-hasura-admin-secret": ADMIN_SECRET,
-          "x-hasura-role": "user",
-          "x-hasura-user-id": userId.toString(),
-        },
-      });
+  // const fetchLast7DaysTotals = async () => {
+  //   try {
+  //     const url = `${API_BASE_URL}/all-transactions?days=7`;
+  //     const response = await fetch(url, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "x-hasura-admin-secret": ADMIN_SECRET,
+  //         "x-hasura-role": "user",
+  //         "x-hasura-user-id": userId.toString(),
+  //       },
+  //     });
 
-      const responseText = await response.text();
-      const data = JSON.parse(responseText);
+  //     const responseText = await response.text();
+  //     const data = JSON.parse(responseText);
       
-      if (!response.ok) {
-        throw new Error(data.message || `Failed to fetch last 7 days totals: ${response.status}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(data.message || `Failed to fetch last 7 days totals: ${response.status}`);
+  //     }
 
-      const processedData = data.transactions?.map(t => ({
-        date: t.date,
-        sum: t.amount,
-        type: t.type
-      })) || [];
+  //     const processedData = data.transactions?.map(t => ({
+  //       date: t.date,
+  //       sum: t.amount,
+  //       type: t.type
+  //     })) || [];
       
-      setLast7DaysTotals(processedData);
-    } catch (err) {
-      console.error("Error fetching last 7 days totals:", err);
-      setLast7DaysTotals([]);
-    }
-  };
+  //     setLast7DaysTotals(processedData);
+  //   } catch (err) {
+  //     console.error("Error fetching last 7 days totals:", err);
+  //     setLast7DaysTotals([]);
+  //   }
+  // };
 
   const calculateTotals = (transactions) => {
     const creditTotal = transactions
@@ -219,7 +219,7 @@ const Transactions = () => {
 
       // Refresh transactions after deletion
       await fetchTransactions();
-      await fetchLast7DaysTotals();
+      // await fetchLast7DaysTotals();
     } catch (err) {
       console.error("Error deleting transaction:", err);
       alert("Failed to delete transaction. Please try again.");
@@ -259,7 +259,7 @@ const Transactions = () => {
       }
 
       await fetchTransactions();
-      await fetchLast7DaysTotals();
+      // await fetchLast7DaysTotals();
       setIsEditModalOpen(false);
     } catch (err) {
       console.error("Error updating transaction:", err);
@@ -313,7 +313,7 @@ const Transactions = () => {
     const fetchData = async () => {
       try {
         await fetchTransactions();
-        await fetchLast7DaysTotals();
+        // await fetchLast7DaysTotals();
       } catch (err) {
         setError(err.message);
       }
@@ -706,7 +706,7 @@ const Transactions = () => {
         onClose={() => setIsModalOpen(false)}
         onTransactionAdded={() => {
           fetchTransactions();
-          fetchLast7DaysTotals();
+          // fetchLast7DaysTotals();
         }}
       />
 
