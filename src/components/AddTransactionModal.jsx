@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const AddTransactionModal = ({ isOpen, onClose }) => {
+const AddTransactionModal = ({ isOpen, onClose, onTransactionAdded }) => {
   const [formData, setFormData] = useState({
     name: "",
     type: "",
@@ -121,8 +121,45 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
         throw new Error(responseData.message || "Failed to add transaction");
       }
 
+      // Store transaction in local storage to trigger dashboard update
+      const newTransaction = {
+        id: responseData.insert_transactions_one.id,
+        transaction_name: formData.name,
+        type: formData.type,
+        category: formData.category,
+        amount: amountValue,
+        date: transactionDateTime,
+        user_id: userId
+      };
+      
+      // Get existing transactions from local storage
+      const existingTransactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+      
+      // Add new transaction and store
+      const updatedTransactions = [newTransaction, ...existingTransactions];
+      localStorage.setItem('transactions', JSON.stringify(updatedTransactions));
+      
+      // Update totals in local storage
+      const creditTotal = parseFloat(localStorage.getItem('creditTotal') || '0');
+      const debitTotal = parseFloat(localStorage.getItem('debitTotal') || '0');
+      
+      if (formData.type === 'credit') {
+        localStorage.setItem('creditTotal', (creditTotal + amountValue).toString());
+      } else {
+        localStorage.setItem('debitTotal', (debitTotal + amountValue).toString());
+      }
+      
+      // Set a flag to indicate data needs refresh
+      localStorage.setItem('shouldRefreshDashboard', 'true');
+
       alert("Transaction added successfully!");
       onClose();
+      
+      // Call the callback to refresh dashboard
+      if (onTransactionAdded) {
+        onTransactionAdded();
+      }
+      
       // Reset form
       setFormData({
         name: "",

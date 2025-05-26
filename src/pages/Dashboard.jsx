@@ -29,6 +29,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   const COLORS = ["#4FD1C5", "#F6AD55", "#FC8181", "#90CDF4"];
   const API_URL = import.meta.env.VITE_HASURA_API_URL;
@@ -131,6 +132,7 @@ const Dashboard = () => {
       ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
       setTransactions(sortedTransactions);
+      setLastUpdated(new Date());
     } catch (err) {
       console.error("Error fetching data:", err);
       setError("Failed to fetch data. Please try again later.");
@@ -140,12 +142,27 @@ const Dashboard = () => {
     }
   };
 
+  // Initial data fetch
   useEffect(() => {
     fetchData();
   }, [API_URL, ADMIN_SECRET, userId]);
 
+  // Set up polling for auto-refresh
+  useEffect(() => {
+    const pollingInterval = setInterval(() => {
+      fetchData();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(pollingInterval);
+  }, []);
+
   const handleRefresh = () => {
     fetchData();
+  };
+
+  const handleTransactionAdded = () => {
+    fetchData(); // Explicit refresh when a new transaction is added
+    setIsModalOpen(false);
   };
 
   if (loading && !refreshing) {
@@ -282,7 +299,7 @@ const Dashboard = () => {
           </div>
           <div className="mt-4 pt-4 border-t border-white border-opacity-20">
             <p className="text-sm text-green-100 text-opacity-80">
-              Last updated: {format(new Date(), "MMM d, h:mm a")}
+              Last updated: {format(lastUpdated, "MMM d, h:mm a")}
             </p>
           </div>
         </div>
@@ -316,7 +333,7 @@ const Dashboard = () => {
           </div>
           <div className="mt-4 pt-4 border-t border-white border-opacity-20">
             <p className="text-sm text-red-100 text-opacity-80">
-              Last updated: {format(new Date(), "MMM d, h:mm a")}
+              Last updated: {format(lastUpdated, "MMM d, h:mm a")}
             </p>
           </div>
         </div>
@@ -640,7 +657,7 @@ const Dashboard = () => {
       <AddTransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onTransactionAdded={fetchData}
+        onTransactionAdded={handleTransactionAdded}
       />
     </div>
   );
