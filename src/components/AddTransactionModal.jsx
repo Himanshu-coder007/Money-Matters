@@ -7,8 +7,22 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
     category: "",
     amount: "",
     date: "",
+    time: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({
+    amount: ""
+  });
+
+  const categories = [
+    { value: "", label: "Select" },
+    { value: "shopping", label: "Shopping" },
+    { value: "food", label: "Food" },
+    { value: "transport", label: "Transport" },
+    { value: "entertainment", label: "Entertainment" },
+    { value: "transfer", label: "Transfer" },
+    { value: "education", label: "Education" }
+  ];
 
   useEffect(() => {
     if (isOpen) {
@@ -31,7 +45,20 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    
+    // Validate amount
+    if (name === "amount") {
+      const amountValue = parseFloat(value);
+      if (amountValue < 0.01) {
+        setErrors(prev => ({ ...prev, amount: "Amount must be at least 0.01" }));
+      } else if (amountValue > 1000000) {
+        setErrors(prev => ({ ...prev, amount: "Amount cannot exceed 1,000,000" }));
+      } else {
+        setErrors(prev => ({ ...prev, amount: "" }));
+      }
+    }
+    
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -39,6 +66,24 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form before submission
+    if (errors.amount) {
+      alert("Please fix the errors before submitting");
+      return;
+    }
+    
+    const amountValue = parseFloat(formData.amount);
+    if (amountValue < 0.01 || amountValue > 1000000) {
+      setErrors(prev => ({
+        ...prev,
+        amount: amountValue < 0.01 
+          ? "Amount must be at least 0.01" 
+          : "Amount cannot exceed 1,000,000"
+      }));
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -63,7 +108,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
             name: formData.name,
             type: formData.type,
             category: formData.category,
-            amount: parseFloat(formData.amount),
+            amount: amountValue,
             date: transactionDateTime,
             user_id: userId
           }),
@@ -138,15 +183,19 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <input
-              type="text"
+            <select
               name="category"
               value={formData.category}
               onChange={handleChange}
-              placeholder="Enter category (e.g., Shopping, Food)"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
-            />
+            >
+              {categories.map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
           </div>
           
           <div>
@@ -156,12 +205,16 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
               name="amount"
               value={formData.amount}
               onChange={handleChange}
-              placeholder="Enter Your Amount"
+              placeholder="Enter Your Amount limit : $ 0.01 to $ 1000000"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
-              min="0"
+              min="0.01"
+              max="1000000"
               step="0.01"
             />
+            {errors.amount && (
+              <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
+            )}
           </div>
           
           <div className="grid grid-cols-2 gap-4">
@@ -201,7 +254,7 @@ const AddTransactionModal = ({ isOpen, onClose }) => {
             <button
               type="submit"
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !!errors.amount}
             >
               {isSubmitting ? "Adding..." : "Add Transaction"}
             </button>
