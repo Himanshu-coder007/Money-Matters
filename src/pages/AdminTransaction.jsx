@@ -16,13 +16,56 @@ const AdminTransactions = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [userProfiles, setUserProfiles] = useState({}); // Stores user profiles by ID
 
   const API_BASE_URL = "https://bursting-gelding-24.hasura.app/api/rest/all-transactions";
+  const PROFILE_API_URL = "https://bursting-gelding-24.hasura.app/api/rest/profile";
   const ADMIN_SECRET = "g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF";
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  // Fetch user profiles for all unique user IDs in transactions
+  const fetchUserProfiles = async (userIds) => {
+    try {
+      const profiles = {};
+      
+      // Fetch profiles for each user in parallel
+      await Promise.all(userIds.map(async (userId) => {
+        const response = await fetch(PROFILE_API_URL, {
+          method: "GET",
+          headers: {
+            "content-type": "application/json",
+            "x-hasura-admin-secret": ADMIN_SECRET,
+            "x-hasura-role": "user",
+            "x-hasura-user-id": userId.toString()
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.users && data.users.length > 0) {
+            profiles[userId] = data.users[0].name || `User ${userId}`;
+          } else {
+            profiles[userId] = `User ${userId}`;
+          }
+        } else {
+          profiles[userId] = `User ${userId}`;
+        }
+      }));
+
+      setUserProfiles(profiles);
+    } catch (err) {
+      console.error("Error fetching user profiles:", err);
+      // If there's an error, just use default user IDs as names
+      const defaultProfiles = {};
+      userIds.forEach(id => {
+        defaultProfiles[id] = `User ${id}`;
+      });
+      setUserProfiles(defaultProfiles);
+    }
   };
 
   // Extract unique categories and users for filter
@@ -36,14 +79,15 @@ const AdminTransactions = () => {
     })
     .filter(transaction => {
       if (!searchTerm) return true;
+      const userName = userProfiles[transaction.user_id] || `User ${transaction.user_id}`;
       return (
         transaction.transaction_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.amount?.toString().includes(searchTerm) ||
         formatDate(transaction.date).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.user_id?.toString().includes(searchTerm)
-      );
-    })
+    )})
     .filter(transaction => {
       if (selectedCategories.length === 0) return true;
       return selectedCategories.includes(transaction.category);
@@ -130,6 +174,10 @@ const AdminTransactions = () => {
         total: data.total || data.transactions.length 
       }));
       calculateTotals(data.transactions);
+      
+      // Extract unique user IDs and fetch their profiles
+      const userIds = [...new Set(data.transactions.map(t => t.user_id))];
+      fetchUserProfiles(userIds);
     } catch (err) {
       setError(err.message);
       console.error("API Error:", err);
@@ -169,7 +217,7 @@ const AdminTransactions = () => {
   // Function to export data to CSV
   const exportToCSV = () => {
     // Prepare CSV content
-    const headers = ["User ID", "Name", "Category", "Type", "Amount", "Date"];
+    const headers = ["User", "Name", "Category", "Type", "Amount", "Date"];
     const csvRows = [];
     
     // Add headers
@@ -177,8 +225,9 @@ const AdminTransactions = () => {
     
     // Add data rows
     filteredTransactions.forEach(transaction => {
+      const userName = userProfiles[transaction.user_id] || `User ${transaction.user_id}`;
       const row = [
-        transaction.user_id,
+        `"${userName.replace(/"/g, '""')}"`,
         `"${transaction.transaction_name?.replace(/"/g, '""') || ''}"`,
         `"${transaction.category?.replace(/"/g, '""') || ''}"`,
         `"${transaction.type || ''}"`,
@@ -366,7 +415,7 @@ const AdminTransactions = () => {
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-medium text-gray-700 mb-2">User IDs</h3>
+                        <h3 className="text-sm font-medium text-gray-700 mb-2">Users</h3>
                         <div className="space-y-2 max-h-40 overflow-y-auto">
                           {users.map(userId => (
                             <div key={userId} className="flex items-center">
@@ -378,7 +427,7 @@ const AdminTransactions = () => {
                                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                               />
                               <label htmlFor={`filter-user-${userId}`} className="ml-2 text-sm text-gray-700">
-                                User {userId}
+                                {userProfiles[userId] || `User ${userId}`}
                               </label>
                             </div>
                           ))}
@@ -415,7 +464,7 @@ const AdminTransactions = () => {
                   onClick={() => requestSort("user_id")}
                 >
                   <div className="flex items-center">
-                    User ID
+                    User
                     {getSortIcon("user_id")}
                   </div>
                 </th>
@@ -508,8 +557,20 @@ const AdminTransactions = () => {
                       exit={{ opacity: 0 }}
                       className="hover:bg-gray-50 transition-colors"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {transaction.user_id}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-medium">
+                            {userProfiles[transaction.user_id]?.charAt(0).toUpperCase() || 'U'}
+                          </div>
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-gray-900">
+                              {userProfiles[transaction.user_id] || `User ${transaction.user_id}`}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              ID: {transaction.user_id}
+                            </div>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
