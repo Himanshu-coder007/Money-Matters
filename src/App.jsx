@@ -6,6 +6,7 @@ import Profile from './pages/Profile';
 import Login from './auth/Login';
 import ProtectedRoute from './auth/ProtectedRoute';
 import AdminTransaction from './pages/AdminTransaction';
+import AdminDahboard from './pages/AdminDahboard';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="transactions" element={<Transactions />} />
             <Route path="profile" element={<Profile />} />
             <Route path="admin/transactions" element={<AdminTransaction />} />
+             <Route path="admin/dashboard" element={<AdminDahboard />} />
           </Route>
         </Route>
       </Routes>

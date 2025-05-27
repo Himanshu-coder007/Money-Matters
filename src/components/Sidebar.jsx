@@ -4,6 +4,8 @@ import { FiHome, FiPieChart, FiUser, FiSettings, FiLogOut } from "react-icons/fi
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const userId = localStorage.getItem('userId');
+  const isAdmin = userId === '3'; // Check if user is admin
 
   const handleLogout = () => {
     // Remove userId from localStorage
@@ -23,28 +25,58 @@ const Sidebar = () => {
       </div>
       <nav className="flex-1 flex flex-col justify-between px-4 py-6">
         <div>
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
-                isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
-              }`
-            }
-          >
-            <FiHome className="mr-3 text-lg" />
-            <span className="font-medium">Dashboard</span>
-          </NavLink>
-          <NavLink
-            to="/transactions"
-            className={({ isActive }) =>
-              `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
-                isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
-              }`
-            }
-          >
-            <FiPieChart className="mr-3 text-lg" />
-            <span className="font-medium">Transactions</span>
-          </NavLink>
+          {isAdmin ? (
+            <>
+              <NavLink
+                to="/admin/dashboard"
+                className={({ isActive }) =>
+                  `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+                    isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  }`
+                }
+              >
+                <FiHome className="mr-3 text-lg" />
+                <span className="font-medium">Dashboard</span>
+              </NavLink>
+              <NavLink
+                to="/admin/transactions"
+                className={({ isActive }) =>
+                  `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+                    isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  }`
+                }
+              >
+                <FiPieChart className="mr-3 text-lg" />
+                <span className="font-medium">Transactions</span>
+              </NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+                    isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  }`
+                }
+              >
+                <FiHome className="mr-3 text-lg" />
+                <span className="font-medium">Dashboard</span>
+              </NavLink>
+              <NavLink
+                to="/transactions"
+                className={({ isActive }) =>
+                  `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
+                    isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                  }`
+                }
+              >
+                <FiPieChart className="mr-3 text-lg" />
+                <span className="font-medium">Transactions</span>
+              </NavLink>
+            </>
+          )}
+          
           <NavLink
             to="/profile"
             className={({ isActive }) =>
@@ -58,7 +90,6 @@ const Sidebar = () => {
           </NavLink>
         </div>
         <div className="border-t border-gray-700 pt-4">
-          
           <button 
             onClick={handleLogout}
             className="flex items-center w-full py-3 px-4 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-200 mt-2"
