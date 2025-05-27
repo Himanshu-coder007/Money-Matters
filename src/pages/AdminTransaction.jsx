@@ -85,8 +85,7 @@ const AdminTransactions = () => {
         transaction.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         transaction.amount?.toString().includes(searchTerm) ||
         formatDate(transaction.date).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        transaction.user_id?.toString().includes(searchTerm)
+        userName.toLowerCase().includes(searchTerm.toLowerCase())
     )})
     .filter(transaction => {
       if (selectedCategories.length === 0) return true;
@@ -565,9 +564,6 @@ const AdminTransactions = () => {
                           <div className="ml-3">
                             <div className="text-sm font-medium text-gray-900">
                               {userProfiles[transaction.user_id] || `User ${transaction.user_id}`}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              ID: {transaction.user_id}
                             </div>
                           </div>
                         </div>

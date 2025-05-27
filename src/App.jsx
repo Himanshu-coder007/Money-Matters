@@ -17,7 +17,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="profile" element={<Profile />} />
-            <Route path="admintransactions" element={<AdminTransaction />} />
+            <Route path="admin/transactions" element={<AdminTransaction />} />
           </Route>
         </Route>
       </Routes>
