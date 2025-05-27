@@ -412,26 +412,6 @@ const AdminTransactions = () => {
                           ))}
                         </div>
                       </div>
-
-                      <div>
-                        <h3 className="text-sm font-medium text-gray-700 mb-2">Users</h3>
-                        <div className="space-y-2 max-h-40 overflow-y-auto">
-                          {users.map(userId => (
-                            <div key={userId} className="flex items-center">
-                              <input
-                                id={`filter-user-${userId}`}
-                                type="checkbox"
-                                checked={selectedUsers.includes(userId)}
-                                onChange={() => toggleUserFilter(userId)}
-                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                              />
-                              <label htmlFor={`filter-user-${userId}`} className="ml-2 text-sm text-gray-700">
-                                {userProfiles[userId] || `User ${userId}`}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
                     </div>
                   </motion.div>
                 )}
