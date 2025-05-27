@@ -10,7 +10,7 @@ const AdminTransactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({ limit: 100, offset: 0, total: 0 });
+  const [pagination, setPagination] = useState({ limit: 500, offset: 0, total: 0 });
   const [clientPagination, setClientPagination] = useState({ limit: 10, offset: 0 });
   const [totals, setTotals] = useState({ credit: 0, debit: 0 });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
