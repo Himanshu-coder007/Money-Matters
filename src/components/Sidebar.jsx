@@ -27,7 +27,7 @@ const Sidebar = () => {
           {isAdmin ? (
             <>
               <NavLink
-                to="/admin/dashboard"
+                to="/"
                 className={({ isActive }) =>
                   `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
                     isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
