@@ -1,16 +1,15 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiHome, FiPieChart, FiUser, FiSettings, FiLogOut } from "react-icons/fi";
+import { FiHome, FiPieChart, FiUser, FiLogOut } from "react-icons/fi";
+import { LOCAL_STORAGE_KEYS } from '../utils/constants';
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const userId = localStorage.getItem('userId');
-  const isAdmin = userId === '3'; // Check if user is admin
+  const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID);
+  const isAdmin = userId === '3';
 
   const handleLogout = () => {
-    // Remove userId from localStorage
-    localStorage.removeItem('userId');
-    // Navigate to login page
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_ID);
     navigate('/login');
   };
 
@@ -28,7 +27,7 @@ const Sidebar = () => {
           {isAdmin ? (
             <>
               <NavLink
-                to="/"
+                to="/admin/dashboard"
                 className={({ isActive }) =>
                   `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
                     isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
@@ -54,6 +53,7 @@ const Sidebar = () => {
             <>
               <NavLink
                 to="/"
+                end
                 className={({ isActive }) =>
                   `flex items-center py-3 px-4 rounded-lg mb-2 transition-colors duration-200 ${
                     isActive ? "bg-purple-700 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
