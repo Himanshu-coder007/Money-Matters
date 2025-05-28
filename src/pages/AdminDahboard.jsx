@@ -65,8 +65,7 @@ const AdminDashboard = () => {
       ]);
 
       // Fetch last 7 days transactions for admin
-      // Fetch last 7 days transactions
-      const weekResponse = await fetch(`${API_URL}/daywise-totals-7-days`, {
+      const weekResponse = await fetch(`${API_URL}/daywise-totals-last-7-days-admin`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -89,7 +88,7 @@ const AdminDashboard = () => {
       };
 
       // Process transactions if they exist
-      const transactions = weekTransactionsData.last_7_days_transactions_credit_debit_totals_admin || [];
+      const transactions = weekTransactionsData.last_7_days_transactions_totals_admin || [];
       transactions.forEach((transaction) => {
         const date = new Date(transaction.date);
         const day = format(date, "EEE"); // Short day name (Mon, Tue, etc.)
@@ -102,11 +101,11 @@ const AdminDashboard = () => {
       });
 
       // Convert to array format for the chart
-      const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
       const completeBarData = daysOfWeek.map((day) => ({
         name: day,
-        credit: groupedByDay[day].credit,
-        debit: groupedByDay[day].debit,
+        credit: groupedByDay[day]?.credit || 0,
+        debit: groupedByDay[day]?.debit || 0,
       }));
 
       setBarData(completeBarData);
@@ -353,7 +352,6 @@ const AdminDashboard = () => {
                   }}
                   formatter={(value) => [
                     `$${value.toLocaleString()}`,
-                    value === "credit" ? "Credit" : "Debit",
                   ]}
                   labelStyle={{ fontWeight: "bold", color: "#374151" }}
                 />
@@ -369,6 +367,7 @@ const AdminDashboard = () => {
                   radius={[4, 4, 0, 0]}
                   name="Debit"
                 />
+                <Legend />
               </BarChart>
             </ResponsiveContainer>
           </div>
