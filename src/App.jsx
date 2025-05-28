@@ -26,7 +26,6 @@ function App() {
             <Route path="transactions" element={<Transactions />} />
             <Route path="profile" element={<Profile />} />
             <Route path="admin/transactions" element={<AdminTransaction />} />
-            <Route path="admin/dashboard" element={<AdminDahboard />} />
           </Route>
         </Route>
       </Routes>
