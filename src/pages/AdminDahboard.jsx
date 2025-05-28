@@ -65,7 +65,8 @@ const AdminDashboard = () => {
       ]);
 
       // Fetch last 7 days transactions for admin
-      const weekResponse = await fetch(`${API_URL}/daywise-totals-last-7-days-admin`, {
+      // Fetch last 7 days transactions
+      const weekResponse = await fetch(`${API_URL}/daywise-totals-7-days`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
