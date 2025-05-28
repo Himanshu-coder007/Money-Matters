@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiArrowUp, FiArrowDown, FiRefreshCw } from "react-icons/fi";
+import { FiArrowUp, FiArrowDown, FiRefreshCw, FiTrendingUp, FiTrendingDown, FiDollarSign } from "react-icons/fi";
 import {
   PieChart,
   Pie,
@@ -12,14 +12,20 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
 } from "recharts";
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const AdminDashboard = () => {
   const [pieData, setPieData] = useState([]);
   const [barData, setBarData] = useState([]);
+  const [lineData, setLineData] = useState([]);
+  const [statsData, setStatsData] = useState([]);
   const [creditTotal, setCreditTotal] = useState(0);
   const [debitTotal, setDebitTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -27,9 +33,27 @@ const AdminDashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  const COLORS = ["#4FD1C5", "#F6AD55", "#FC8181", "#90CDF4"];
+  const COLORS = ["#4FD1C5", "#F6AD55", "#FC8181", "#90CDF4", "#9F7AEA", "#68D391"];
   const API_URL = import.meta.env.VITE_HASURA_API_URL;
   const ADMIN_SECRET = import.meta.env.VITE_HASURA_ADMIN_SECRET;
+
+  // Mock data generator for demonstration
+  const generateMockData = (days = 30) => {
+    const data = [];
+    for (let i = days; i >= 0; i--) {
+      const date = subDays(new Date(), i);
+      const credit = Math.floor(Math.random() * 5000) + 1000;
+      const debit = Math.floor(Math.random() * 3000) + 500;
+      data.push({
+        date: format(date, 'yyyy-MM-dd'),
+        day: format(date, 'EEE'),
+        credit,
+        debit,
+        net: credit - debit,
+      });
+    }
+    return data;
+  };
 
   const fetchData = async () => {
     try {
@@ -109,6 +133,45 @@ const AdminDashboard = () => {
       }));
 
       setBarData(completeBarData);
+
+      // Generate mock data for line chart (replace with actual API call)
+      const mockLineData = generateMockData(30);
+      setLineData(mockLineData);
+
+      // Generate stats data
+      const netProfit = creditSum - debitSum;
+      const profitPercentage = creditSum > 0 ? ((netProfit / creditSum) * 100).toFixed(2) : 0;
+      
+      setStatsData([
+        {
+          title: "Total Transactions",
+          value: (creditSum + debitTotal).toLocaleString(),
+          isPositive: true,
+          icon: <FiDollarSign className="text-blue-500" />,
+        },
+        {
+          title: "Profit Margin",
+          value: `${profitPercentage}%`,
+          
+          isPositive: profitPercentage >= 0,
+          icon: netProfit >= 0 ? <FiTrendingUp className="text-green-500" /> : <FiTrendingDown className="text-red-500" />,
+        },
+        {
+          title: "Avg. Daily Credit",
+          value: `$${(creditSum / 30).toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+        
+          isPositive: true,
+          icon: <FiArrowUp className="text-teal-500" />,
+        },
+        {
+          title: "Avg. Daily Debit",
+          value: `$${(debitSum / 30).toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+       
+          isPositive: false,
+          icon: <FiArrowDown className="text-orange-500" />,
+        },
+      ]);
+
       setLastUpdated(new Date());
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -210,6 +273,9 @@ const AdminDashboard = () => {
           </p>
         </div>
         <div className="flex items-center space-x-4 mt-4 md:mt-0">
+          <span className="text-sm text-gray-500">
+            Last updated: {format(lastUpdated, "MMM d, h:mm a")}
+          </span>
           <button
             onClick={handleRefresh}
             disabled={refreshing}
@@ -225,6 +291,28 @@ const AdminDashboard = () => {
             {refreshing ? "Refreshing..." : "Refresh"}
           </button>
         </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {statsData.map((stat, index) => (
+          <div key={index} className="bg-white p-6 rounded-2xl shadow">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">{stat.title}</p>
+                <p className="text-2xl font-semibold text-gray-800 mt-1">
+                  {stat.value}
+                </p>
+                <div className="flex items-center mt-2">
+                 
+                </div>
+              </div>
+              <div className="h-12 w-12 rounded-lg bg-gray-50 flex items-center justify-center">
+                {stat.icon}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Summary Cards */}
@@ -258,11 +346,6 @@ const AdminDashboard = () => {
               />
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-white border-opacity-20">
-            <p className="text-sm text-green-100 text-opacity-80">
-              Last updated: {format(lastUpdated, "MMM d, h:mm a")}
-            </p>
-          </div>
         </div>
 
         {/* Debit Card */}
@@ -294,16 +377,12 @@ const AdminDashboard = () => {
               />
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-white border-opacity-20">
-            <p className="text-sm text-red-100 text-opacity-80">
-              Last updated: {format(lastUpdated, "MMM d, h:mm a")}
-            </p>
-          </div>
         </div>
       </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Weekly Transaction Bar Chart */}
         <div className="bg-white p-6 rounded-2xl shadow lg:col-span-2">
           <div className="flex justify-between items-center mb-6">
             <div>
@@ -373,6 +452,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Balance Distribution Pie Chart */}
         <div className="bg-white p-6 rounded-2xl shadow">
           <h2 className="text-xl font-semibold text-gray-800 mb-6">
             Balance Distribution
@@ -457,6 +537,143 @@ const AdminDashboard = () => {
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Monthly Trend Line Chart */}
+        <div className="bg-white p-6 rounded-2xl shadow">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800">
+                30-Day Transaction Trend
+              </h2>
+              <p className="text-gray-600">Daily net balance over the last month</p>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
+              <span className="text-sm text-gray-600">Net Balance</span>
+            </div>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={lineData}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#f0f0f0"
+                />
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#6b7280" }}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#6b7280" }}
+                  tickFormatter={(value) => `$${value.toLocaleString()}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    borderRadius: "0.5rem",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    border: "none",
+                  }}
+                  formatter={(value) => [
+                    `$${value.toLocaleString()}`,
+                    "Net Balance",
+                  ]}
+                  labelStyle={{ fontWeight: "bold", color: "#374151" }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="net"
+                  stroke="#667EEA"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 6, stroke: "#667EEA", strokeWidth: 2 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Credit vs Debit Area Chart */}
+        <div className="bg-white p-6 rounded-2xl shadow">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800">
+                Credit vs Debit Trend
+              </h2>
+              <p className="text-gray-600">Daily comparison over the last month</p>
+            </div>
+            <div className="flex space-x-2">
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full bg-teal-400 mr-2"></div>
+                <span className="text-sm text-gray-600">Credit</span>
+              </div>
+              <div className="flex items-center ml-3">
+                <div className="w-3 h-3 rounded-full bg-orange-400 mr-2"></div>
+                <span className="text-sm text-gray-600">Debit</span>
+              </div>
+            </div>
+          </div>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={lineData}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#f0f0f0"
+                />
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#6b7280" }}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#6b7280" }}
+                  tickFormatter={(value) => `$${value.toLocaleString()}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    borderRadius: "0.5rem",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    border: "none",
+                  }}
+                  formatter={(value) => [
+                    `$${value.toLocaleString()}`,
+                  ]}
+                  labelStyle={{ fontWeight: "bold", color: "#374151" }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="credit"
+                  stroke="#4FD1C5"
+                  fill="#4FD1C5"
+                  fillOpacity={0.2}
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="debit"
+                  stroke="#F6AD55"
+                  fill="#F6AD55"
+                  fillOpacity={0.2}
+                  strokeWidth={2}
+                />
+                <Legend />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
