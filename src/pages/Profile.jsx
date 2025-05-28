@@ -8,11 +8,13 @@ const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID) || "1";
+        const storedUserId = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID) || "1";
+        setUserId(storedUserId);
         
         const response = await fetch(`${import.meta.env.VITE_HASURA_API_URL}/profile`, {
           method: "GET",
@@ -20,7 +22,7 @@ const Profile = () => {
             "content-type": "application/json",
             "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_SECRET,
             "x-hasura-role": "user",
-            "x-hasura-user-id": userId
+            "x-hasura-user-id": storedUserId
           }
         });
 
@@ -124,13 +126,15 @@ const Profile = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">My Profile</h1>
             <p className="text-gray-500 mt-1">Manage your personal information</p>
           </div>
-          <button 
-            className="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg cursor-pointer"
-            onClick={() => setIsModalOpen(true)}
-          >
-            <FiPlus className="mr-2" />
-            Add Transaction
-          </button>
+          {userId !== "3" && (
+            <button 
+              className="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg cursor-pointer"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <FiPlus className="mr-2" />
+              Add Transaction
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
